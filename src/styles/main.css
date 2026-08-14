@@ -241,9 +241,9 @@ body.is-page .island { transform: translateX(-50%) translateY(0); } /* always sh
 .hero__players { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .rise { position: absolute; bottom: var(--b, 0%); width: var(--w, 30vw); z-index: var(--z, 2);
   filter: drop-shadow(0 30px 60px rgba(0,0,0,0.65)); will-change: transform, opacity;
-  clip-path: polygon(0 45%, 25% 20%, 50% 35%, 75% 15%, 100% 50%, 100% 100%, 0 100%);
-  object-fit: cover; }
-.rise img { width: 100%; height: auto; display: block; }
+  clip-path: polygon(15% 35%, 30% 15%, 50% 32%, 70% 18%, 85% 40%, 100% 100%, 0 100%);
+  object-fit: cover; mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 25%); }
+.rise img { width: 100%; height: 100%; display: block; object-fit: cover; }
 .rise--L { left: var(--x, 0); }
 .rise--R { right: var(--x, 0); }
 
@@ -315,8 +315,9 @@ body.is-page .site { background: var(--paper); }
 .panel:first-child { margin-left: 0; }
 .panel.is-active { flex-grow: 6; cursor: default; }
 .panel:not(.is-active) { flex-grow: 0.85; }
-.panel__bg { position: absolute; inset: 0; background-size: cover; background-position: center;
-  transform: scale(1.08); transition: transform 1.1s var(--ease), filter 0.8s var(--ease);
+.panel__bg { position: absolute; inset: 0; background-size: cover; background-position: center center;
+  background-repeat: no-repeat; transform: scale(1.08);
+  transition: transform 1.1s var(--ease), filter 0.8s var(--ease);
   filter: grayscale(0.5) brightness(0.5); }
 .panel.is-active .panel__bg { transform: scale(1); filter: grayscale(0) brightness(0.72); }
 .panel__shade { position: absolute; inset: 0;
