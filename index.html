@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sports Academy — Premier Racquet Sports</title>
+    <meta name="description" content="Premier badminton, pickleball, and table tennis facility. Championship courts, expert coaching, and pro shop." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter+Tight:ital,wght@0,400;0,500;0,600;1,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <canvas id="ascii-trail"></canvas>
+
+    <!-- ===== NAV (injected) ===== -->
+    <div data-chrome="nav"></div>
+
+    <!-- ===== HERO: pinned parallax — court + players rise, FORTIUS resolves ===== -->
+    <header id="top" class="hero">
+      <div class="hero__stage">
+        <!-- top system bar -->
+        <div class="hero__topbar">
+          <span>RACQUET // SPORTS</span>
+          <span>21 COURTS · BWF&nbsp;STD</span>
+        </div>
+
+        <!-- green perspective court rising in behind -->
+        <div class="hero__court" aria-hidden="true">
+          <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="court" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#0c4524" />
+                <stop offset="1" stop-color="#1fa14d" />
+              </linearGradient>
+            </defs>
+            <!-- floor: bottom half, in perspective -->
+            <polygon points="330,500 670,500 1000,1000 0,1000" fill="url(#court)" />
+            <g fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" vector-effect="non-scaling-stroke">
+              <polygon points="330,500 670,500 1000,1000 0,1000" />
+              <line x1="500" y1="500" x2="500" y2="1000" />
+              <line x1="353.8" y1="500" x2="70" y2="1000" />
+              <line x1="646.2" y1="500" x2="930" y2="1000" />
+              <line x1="165" y1="750" x2="835" y2="750" />
+            </g>
+            <!-- net mesh rising to ~66% -->
+            <g stroke="rgba(255,255,255,0.28)" stroke-width="1.2" vector-effect="non-scaling-stroke">
+              <line x1="330" y1="40" x2="330" y2="500" /><line x1="368" y1="40" x2="368" y2="500" />
+              <line x1="406" y1="40" x2="406" y2="500" /><line x1="444" y1="40" x2="444" y2="500" />
+              <line x1="482" y1="40" x2="482" y2="500" /><line x1="520" y1="40" x2="520" y2="500" />
+              <line x1="558" y1="40" x2="558" y2="500" /><line x1="596" y1="40" x2="596" y2="500" />
+              <line x1="634" y1="40" x2="634" y2="500" /><line x1="670" y1="40" x2="670" y2="500" />
+              <line x1="330" y1="110" x2="670" y2="110" /><line x1="330" y1="180" x2="670" y2="180" />
+              <line x1="330" y1="250" x2="670" y2="250" /><line x1="330" y1="320" x2="670" y2="320" />
+              <line x1="330" y1="390" x2="670" y2="390" /><line x1="330" y1="460" x2="670" y2="460" />
+            </g>
+            <!-- posts + top tape -->
+            <g stroke="rgba(255,255,255,0.8)" stroke-width="2.6" vector-effect="non-scaling-stroke">
+              <line x1="330" y1="500" x2="330" y2="40" /><line x1="670" y1="500" x2="670" y2="40" />
+            </g>
+            <rect x="330" y="28" width="340" height="22" fill="rgba(255,255,255,0.78)" />
+          </svg>
+        </div>
+
+        <!-- six rising player cutouts (back-to-front DOM order) -->
+        <div class="hero__players">
+          <figure class="rise rise--L" style="--x:7vw;--w:33vw;--b:-7%;--z:2">
+            <img class="js-cutout" data-src="/img/players/ready.png" alt="" />
+          </figure>
+          <figure class="rise rise--R" style="--x:6vw;--w:31vw;--b:-7%;--z:2">
+            <img class="js-cutout" data-src="/img/players/medal.png" alt="" />
+          </figure>
+          <figure class="rise rise--L" style="--x:20vw;--w:30vw;--b:-9%;--z:2">
+            <img class="js-cutout" data-src="/img/players/cheer.png" alt="" />
+          </figure>
+          <figure class="rise rise--R" style="--x:18vw;--w:30vw;--b:-9%;--z:2">
+            <img class="js-cutout" data-src="/img/players/lunge.png" alt="" />
+          </figure>
+          <figure class="rise rise--L" style="--x:-9vw;--w:46vw;--b:-11%;--z:4">
+            <img class="js-cutout" data-src="/img/players/smash.png" alt="" />
+          </figure>
+          <figure class="rise rise--R" style="--x:-9vw;--w:44vw;--b:-10%;--z:4">
+            <img class="js-cutout" data-src="/img/players/stand.png" alt="" />
+          </figure>
+        </div>
+
+        <h1 class="hero__title">RACQUET<small>Premier Sports · Alpharetta</small></h1>
+
+        <div class="hero__vignette"></div>
+        <pre class="hero__arrow" aria-hidden="true"><b>SCROLL</b>  |
+  |
+  v</pre>
+      </div>
+    </header>
+
+    <main class="site">
+      <!-- Facility overview -->
+      <section class="section" id="facility">
+        <div class="split">
+          <div class="split__body">
+            <span class="eyebrow">The venue</span>
+            <h2 class="title">Two homes.<br />One academy.</h2>
+            <p class="lede">A brand-new venue built for the game — championship surfaces, international-standard lighting and room to play across three sports.</p>
+            <ul class="feature-list">
+              <li>Game &amp; Grill — 12 badminton + 7 pickleball courts</li>
+              <li>Atlanta Recreation Club — 9 badminton + table tennis</li>
+              <li>International-standard lighting throughout</li>
+              <li>Relaxing lounge area (coming soon)</li>
+            </ul>
+          </div>
+          <div class="split__media" data-parallax="0.05">
+            <img src="/img/fortius/courts-12.jpg" alt="Indoor badminton courts" />
+            <span class="tagchip">12 courts · Game &amp; Grill</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <section class="section stats section--tight" aria-label="Highlights">
+        <ul class="stats__grid">
+          <li><span class="stats__n" data-count="21">0</span><span class="stats__l">BWF-standard courts</span></li>
+          <li><span class="stats__n" data-count="7">0</span><span class="stats__l">pickleball courts</span></li>
+          <li><span class="stats__n" data-count="10">0</span><span class="stats__l">table-tennis tables</span></li>
+          <li><span class="stats__n">∞</span><span class="stats__l">endless smashes</span></li>
+        </ul>
+        <p class="stats__note">// premier coaching · pro shop · two locations across metro Atlanta</p>
+      </section>
+
+      <!-- ===== SIGNATURE: diagonal scroll-accordion ===== -->
+      <section class="acc" id="memberships">
+        <div class="acc__head">
+          <span class="eyebrow">Membership</span>
+          <h2>Pick your court — scroll through.</h2>
+        </div>
+        <div class="acc__row">
+          <article class="panel">
+            <div class="panel__bg" style="background-image:url('/img/fortius/courts-12.jpg')"></div>
+            <div class="panel__shade"></div>
+            <span class="panel__num">01 / 04</span>
+            <span class="panel__label">Badminton</span>
+            <div class="panel__content">
+              <h3>Badminton</h3>
+              <p class="panel__stat">21 BWF-standard courts</p>
+              <p>For endless smashes. Championship surfaces and international-standard lighting across both venues — drop in for a rally or train to compete.</p>
+              <a href="membership.html" class="btn btn--solid">Join badminton</a>
+            </div>
+          </article>
+          <article class="panel">
+            <div class="panel__bg" style="background-image:url('/img/fortius/pickleball-1.jpg')"></div>
+            <div class="panel__shade"></div>
+            <span class="panel__num">02 / 04</span>
+            <span class="panel__label">Pickleball</span>
+            <div class="panel__content">
+              <h3>Pickleball</h3>
+              <p class="panel__stat">7 tournament-grade courts</p>
+              <p>Fun-loaded dinks and fast hands. Seven dedicated courts ready for open play, leagues and tournaments.</p>
+              <a href="membership.html" class="btn btn--solid">Join pickleball</a>
+            </div>
+          </article>
+          <article class="panel">
+            <div class="panel__bg" style="background-image:url('/img/fortius/lighting.jpg')"></div>
+            <div class="panel__shade"></div>
+            <span class="panel__num">03 / 04</span>
+            <span class="panel__label">Table Tennis</span>
+            <div class="panel__content">
+              <h3>Table Tennis</h3>
+              <p class="panel__stat">10 match tables</p>
+              <p>For the ping-pong faithful. Ten tables for casual play, coaching and club nights under arena lighting.</p>
+              <a href="membership.html" class="btn btn--solid">Join table tennis</a>
+            </div>
+          </article>
+          <article class="panel">
+            <div class="panel__bg" style="background-image:url('/img/fortius/lounge.jpg')"></div>
+            <div class="panel__shade"></div>
+            <span class="panel__num">04 / 04</span>
+            <span class="panel__label">Combo · All access</span>
+            <div class="panel__content">
+              <h3>Combo</h3>
+              <p class="panel__stat">All access — every sport</p>
+              <p>Love all? Dink, ping-pong and smash on one membership, plus the lounge. The full run of the academy.</p>
+              <a href="membership.html" class="btn btn--solid">Go all access</a>
+            </div>
+          </article>
+        </div>
+        <div class="acc__progress">
+          <span class="is-on"></span><span></span><span></span><span></span>
+        </div>
+      </section>
+
+      <!-- Coaching -->
+      <section class="section" id="coaching">
+        <div class="section__head">
+          <span class="eyebrow">Coaching</span>
+          <h2 class="title">Train with the best.</h2>
+          <p class="lede">Athletes of every level, from first serve to podium. Choose your discipline.</p>
+        </div>
+        <ul class="rows">
+          <li><span>Badminton</span><em>footwork · technique · match play</em></li>
+          <li><span>Pickleball</span><em>dinks · drives · strategy</em></li>
+          <li><span>Table Tennis</span><em>spin · speed · placement</em></li>
+          <li><span>Conditioning</span><em>athletic training · speed work</em></li>
+          <li><span>Juniors</span><em>enrollment open for young athletes</em></li>
+        </ul>
+      </section>
+
+      <!-- Referral band -->
+      <section class="section band">
+        <div class="band__inner">
+          <div>
+            <span class="eyebrow" style="color:var(--court-bright)">Refer a friend</span>
+            <h2>10% off your first month — for both of you.</h2>
+            <p>Plus a chance to win a <strong>$100 Pro-Shop credit</strong>.</p>
+          </div>
+          <a href="contact.html" class="btn btn--solid btn--lg">Refer now</a>
+        </div>
+      </section>
+
+      <!-- Pro shop -->
+      <section class="section" id="proshop">
+        <div class="split split--rev">
+          <div class="split__body">
+            <span class="eyebrow">Pro shop</span>
+            <h2 class="title">Gear up for the game.</h2>
+            <p class="lede">Top-quality equipment and apparel — fitted and strung on-site by people who play.</p>
+            <ul class="feature-list">
+              <li>Badminton — Yonex shuttles, rackets, shoes &amp; stringing</li>
+              <li>Pickleball — Selkirk paddles, shoes &amp; accessories</li>
+              <li>Apparel, kitbags and match-day essentials</li>
+            </ul>
+          </div>
+          <div class="split__media" data-parallax="0.05">
+            <img src="/img/fortius/proshop.jpg" alt="Pro shop" />
+            <span class="tagchip">Yonex · Selkirk</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section class="section" id="contact">
+        <div class="section__head">
+          <span class="eyebrow">Visit us</span>
+          <h2 class="title">Come play.</h2>
+        </div>
+        <div class="contact__grid">
+          <div class="contact__block">
+            <h3>Game &amp; Grill</h3>
+            <p>5905 Ronald Reagan Blvd<br />Alpharetta, GA 30005</p>
+          </div>
+          <div class="contact__block">
+            <h3>Atlanta Recreation Club</h3>
+            <p>2711 Pine Grove Rd<br />Cumming, GA 30041</p>
+          </div>
+          <div class="contact__block">
+            <h3>Reach us</h3>
+            <p><a href="tel:+16785050464">(678) 505-0464</a><br /><a href="mailto:info@racquetsports.com">info@racquetsports.com</a></p>
+          </div>
+        </div>
+        <a href="contact.html" class="btn btn--solid btn--lg">Book a court</a>
+      </section>
+
+      <div data-chrome="footer"></div>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

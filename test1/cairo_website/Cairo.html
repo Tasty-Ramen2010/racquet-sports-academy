@@ -1,0 +1,1382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cairo — A Tour Through Time</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  :root{
+    --ink:#0e0e0e;
+    --ink-2:#2a2a2a;
+    --mute:#6b6b6b;
+    --rule:#e5e2dc;
+    --paper:#ffffff;
+    --sand:#c86a2a;
+    --sand-deep:#7a3a11;
+    --leaf:#2f6a3a;
+    --leaf-deep:#184224;
+    --serif:'Fraunces', 'Times New Roman', serif;
+    --sans:'Inter', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  body{overflow-x:hidden}
+  img{display:block;max-width:100%}
+  a{color:inherit}
+
+  /* ---------- Top Nav ---------- */
+  .nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 40px;
+    color:#fff;
+    font-family:var(--sans);
+    background:transparent;
+    border-bottom:1px solid transparent;
+    transition:background .35s ease, color .35s ease, padding .3s ease, border-color .35s ease, box-shadow .35s ease;
+  }
+  .nav.solid{
+    background:#ffffff;color:var(--ink);
+    border-bottom-color:var(--rule);
+    box-shadow:0 1px 0 rgba(0,0,0,.02), 0 8px 24px -18px rgba(0,0,0,.18);
+    padding:16px 40px;
+  }
+  .nav .mark{
+    font-family:var(--serif);font-weight:500;font-size:20px;letter-spacing:.02em;
+    font-variation-settings:"opsz" 48;
+  }
+  .nav .mark em{font-style:italic;font-weight:400}
+  .nav ul{list-style:none;display:flex;gap:20px;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+  .nav ul a{text-decoration:none;opacity:.85}
+  .nav.solid ul a{opacity:.7}
+  .nav ul a:hover{opacity:1}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    height:400vh; /* scroll distance for the transition */
+  }
+  .hero-sticky{
+    position:sticky;top:0;height:100vh;overflow:hidden;
+    background:#000;
+  }
+  .layer{
+    position:absolute;inset:0;
+    background-size:cover;background-position:center;
+    will-change:opacity,transform,filter;
+  }
+  .layer.desert{
+    background-image:url('assets/desert.jpg');
+  }
+  .layer.temperate{
+    background-image:url('assets/temperate.jpg');
+    opacity:0;
+  }
+  .hero-vignette{
+    position:absolute;inset:0;pointer-events:none;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,.45) 0%, rgba(0,0,0,0) 24%, rgba(0,0,0,0) 62%, rgba(0,0,0,.55) 100%);
+  }
+
+  /* Top-left meta */
+  .hero-meta{
+    position:absolute;top:110px;left:40px;z-index:3;color:#fff;
+    font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    display:flex;align-items:center;gap:14px;
+  }
+  .hero-meta .dot{width:6px;height:6px;border-radius:50%;background:#fff}
+  .hero-meta em{font-style:normal;opacity:.75}
+
+  /* Title stack (centered) */
+  .title-wrap{
+    position:absolute;inset:0;display:grid;place-items:center;z-index:4;color:#fff;
+    text-align:center;padding:0 24px;
+  }
+  .kicker{
+    font-size:12px;letter-spacing:.38em;text-transform:uppercase;
+    margin-bottom:28px;opacity:.9;
+  }
+  .title{
+    font-family:var(--serif);
+    font-weight:300;
+    font-size:clamp(64px, 11vw, 180px);
+    line-height:.92;
+    letter-spacing:-.02em;
+    font-variation-settings:"opsz" 144;
+    position:relative;
+    display:inline-block;
+  }
+  .title .fixed{opacity:.95}
+  .title .swap{
+    display:inline-block;position:relative;
+    font-style:italic;
+    min-width:6.5ch;
+  }
+  .title .swap .word{
+    position:absolute;left:0;top:0;white-space:nowrap;
+    transition:opacity .6s ease, transform .6s ease, filter .6s ease;
+  }
+  .title .swap .word.present{color:#ffd7a8}
+  .title .swap .word.future{color:#b6e5b9}
+  .title .swap .spacer{visibility:hidden;white-space:nowrap}
+
+  .sub{
+    margin-top:26px;font-size:14px;letter-spacing:.16em;text-transform:uppercase;
+    display:flex;gap:22px;align-items:center;justify-content:center;opacity:.9;
+  }
+  .sub span{position:relative}
+  .sub span + span::before{
+    content:"";position:absolute;left:-12px;top:50%;width:4px;height:4px;
+    background:currentColor;border-radius:50%;transform:translateY(-50%);
+  }
+
+  /* Coords panel (bottom-left) */
+  .coords{
+    position:absolute;left:40px;bottom:40px;z-index:4;color:#fff;
+    font-family:var(--sans);font-size:12px;letter-spacing:.05em;
+    border-left:1px solid rgba(255,255,255,.5);padding:4px 0 4px 16px;
+    display:grid;gap:6px;
+  }
+  .coords .lbl{opacity:.6;text-transform:uppercase;letter-spacing:.22em;font-size:10px}
+  .coords .val{font-family:var(--serif);font-size:22px;font-weight:400;letter-spacing:.02em}
+  .coords .val em{font-style:italic;opacity:.8;font-size:14px;margin-left:6px}
+
+  /* Timeline (bottom-right) */
+  .timeline{
+    position:absolute;right:40px;bottom:40px;z-index:4;color:#fff;
+    width:320px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  }
+  .timeline .row{display:flex;justify-content:space-between;margin-bottom:10px;opacity:.85}
+  .timeline .row em{font-style:normal;font-family:var(--serif);text-transform:none;letter-spacing:0;font-size:15px;font-weight:400;font-style:italic}
+  .timeline .track{
+    height:2px;background:rgba(255,255,255,.25);position:relative;
+  }
+  .timeline .fill{
+    position:absolute;inset:0 100% 0 0;background:#fff;
+  }
+  .timeline .ticks{
+    display:flex;justify-content:space-between;margin-top:8px;font-size:10px;opacity:.65;
+  }
+
+  /* Scroll cue */
+  .scroll-cue{
+    position:absolute;left:50%;bottom:26px;transform:translateX(-50%);
+    z-index:5;color:#fff;font-size:10px;letter-spacing:.34em;text-transform:uppercase;
+    display:flex;flex-direction:column;align-items:center;gap:10px;opacity:.8;
+  }
+  .scroll-cue .line{width:1px;height:30px;background:#fff;animation:cue 2.2s ease-in-out infinite}
+  @keyframes cue{0%,100%{transform:scaleY(.2);transform-origin:top}50%{transform:scaleY(1)}}
+
+  /* Atmosphere particles (dust/leaves) */
+  .atmos{position:absolute;inset:0;pointer-events:none;z-index:2}
+
+  /* ---------- Section: intro ---------- */
+  .section{padding:120px 40px}
+  .container{max-width:1180px;margin:0 auto}
+
+  .eyebrow{
+    font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--mute);
+    display:flex;align-items:center;gap:12px;margin-bottom:28px;
+  }
+  .eyebrow::before{content:"";width:28px;height:1px;background:var(--ink)}
+
+  .lede{
+    font-family:var(--serif);font-weight:300;
+    font-size:clamp(32px,4.2vw,58px);line-height:1.08;letter-spacing:-.01em;
+    max-width:22ch;font-variation-settings:"opsz" 144;
+    text-wrap:balance;
+  }
+  .lede em{font-style:italic;color:var(--sand-deep)}
+
+  .intro-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;
+    margin-top:80px;
+  }
+  .intro-grid p{
+    font-size:17px;line-height:1.65;color:var(--ink-2);max-width:52ch;
+  }
+  .intro-grid p + p{margin-top:20px}
+  .intro-grid .side{
+    border-top:1px solid var(--rule);padding-top:22px;
+  }
+  .intro-grid .side dl{display:grid;grid-template-columns:1fr 1.3fr;gap:14px 20px;font-size:14px}
+  .intro-grid .side dt{color:var(--mute);text-transform:uppercase;letter-spacing:.14em;font-size:11px;padding-top:4px}
+  .intro-grid .side dd{font-family:var(--serif);font-size:20px;font-weight:400;line-height:1.25}
+  .intro-grid .side dd em{font-style:italic;color:var(--mute);font-size:13px;display:block;margin-top:3px}
+
+  /* ---------- Split: Then / Now / Future ---------- */
+  .compare{
+    padding:40px;
+  }
+  .compare-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:2px;
+    background:var(--rule);
+    border:1px solid var(--rule);
+  }
+  .compare-col{background:#fff;padding:56px 48px;min-height:520px;display:flex;flex-direction:column}
+  .compare-col .tag{
+    font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--mute);
+    margin-bottom:14px;
+  }
+  .compare-col h3{
+    font-family:var(--serif);font-weight:400;font-size:46px;line-height:1;
+    margin-bottom:28px;font-variation-settings:"opsz" 144;
+  }
+  .compare-col h3 em{font-style:italic}
+  .compare-col.present h3 em{color:var(--sand-deep)}
+  .compare-col.future h3 em{color:var(--leaf-deep)}
+
+  .compare-col .rows{display:grid;gap:18px;margin-top:auto}
+  .row-item{
+    display:grid;grid-template-columns:140px 1fr;gap:24px;
+    padding:16px 0;border-top:1px solid var(--rule);
+    font-size:14px;
+  }
+  .row-item .k{
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute);
+    padding-top:2px;
+  }
+  .row-item .v{color:var(--ink-2);line-height:1.55}
+  .row-item .v strong{font-weight:500;color:var(--ink)}
+
+  .climate-chip{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:5px 10px;border-radius:999px;
+    font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    background:#f6f1e8;color:var(--sand-deep);
+    margin-right:6px;margin-bottom:4px;
+  }
+  .future .climate-chip{background:#eef5ec;color:var(--leaf-deep)}
+  .climate-chip .swatch{width:8px;height:8px;border-radius:50%;background:currentColor}
+
+  /* ---------- Species strip ---------- */
+  .species{padding:120px 40px;background:#faf8f4}
+  .species .head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px;flex-wrap:wrap;gap:24px}
+  .species h2{
+    font-family:var(--serif);font-weight:300;font-size:clamp(40px,5vw,72px);line-height:1;letter-spacing:-.01em;
+    font-variation-settings:"opsz" 144;max-width:18ch;
+  }
+  .species h2 em{font-style:italic;color:var(--sand-deep)}
+  .species .head p{color:var(--mute);max-width:36ch;font-size:15px;line-height:1.55}
+  .species-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+  .species-card{
+    background:#fff;border:1px solid var(--rule);padding:22px;
+    display:flex;flex-direction:column;gap:14px;min-height:240px;
+    transition:transform .3s ease, box-shadow .3s ease;
+  }
+  .species-card:hover{transform:translateY(-3px);box-shadow:0 20px 40px -20px rgba(0,0,0,.1)}
+  .species-card .status{
+    align-self:flex-start;font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+    padding:4px 8px;border-radius:2px;font-weight:500;
+  }
+  .status.gone{background:#fef1e9;color:#a04b13}
+  .status.stay{background:#f4ecdc;color:#6b4a15}
+  .status.new{background:#eaf2e6;color:#2f5a25}
+  .species-card .name{font-family:var(--serif);font-size:22px;font-weight:400;line-height:1.15;margin-bottom:var(--name-gap, 8px)}
+  .species-card .latin{font-style:italic;color:var(--mute);font-size:13px;display:block}
+  .species-card .note{font-size:13px;line-height:1.5;color:var(--ink-2);margin-top:auto}
+  .species-card .glyph{
+    width:44px;height:44px;border:1px solid var(--ink);border-radius:50%;
+    display:grid;place-items:center;font-family:var(--serif);font-size:18px;font-style:italic;
+  }
+
+  /* ---------- Nutrient Cycles ---------- */
+  .cycles{padding:140px 40px;background:#fff;border-top:1px solid var(--rule)}
+  .cycles .head{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;margin-bottom:70px}
+  .cycles h2{
+    font-family:var(--serif);font-weight:300;font-size:clamp(44px,5.5vw,80px);line-height:.98;letter-spacing:-.015em;
+    font-variation-settings:"opsz" 144;max-width:16ch;
+  }
+  .cycles h2 em{font-style:italic;color:var(--leaf-deep)}
+  .cycles .head p{color:var(--mute);max-width:42ch;font-size:16px;line-height:1.6}
+  .cycles-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule)}
+  .cycle{
+    padding:36px 30px;border-right:1px solid var(--rule);
+    display:flex;flex-direction:column;gap:20px;min-height:340px;
+  }
+  .cycle:last-child{border-right:0}
+  .cycle .ring{
+    width:56px;height:56px;border-radius:50%;border:1px solid var(--ink);
+    display:grid;place-items:center;position:relative;
+  }
+  .cycle .ring svg{width:28px;height:28px}
+  .cycle .label{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--mute)}
+  .cycle h4{font-family:var(--serif);font-weight:400;font-size:26px;line-height:1.15;letter-spacing:-.005em}
+  .cycle h4 em{font-style:italic}
+  .cycle p{font-size:13.5px;line-height:1.6;color:var(--ink-2);margin-top:auto}
+  .cycle p strong{font-weight:500;color:var(--ink)}
+
+  /* ---------- Food Webs ---------- */
+  .webs{padding:140px 40px;background:#faf8f4;border-top:1px solid var(--rule)}
+  .webs .head{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;margin-bottom:70px}
+  .webs h2{
+    font-family:var(--serif);font-weight:300;font-size:clamp(44px,5.5vw,80px);line-height:.98;letter-spacing:-.015em;
+    font-variation-settings:"opsz" 144;max-width:14ch;
+  }
+  .webs h2 em{font-style:italic}
+  .webs .head p{color:var(--mute);max-width:42ch;font-size:16px;line-height:1.6}
+  .webs-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+  .web{
+    background:#fff;border:1px solid var(--rule);padding:40px 36px;
+    display:flex;flex-direction:column;gap:22px;
+  }
+  .web .era{
+    font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--mute);
+    display:flex;align-items:center;gap:10px;
+  }
+  .web .era .sw{width:10px;height:10px;border-radius:50%;background:var(--sand);display:inline-block}
+  .web.future .era .sw{background:var(--leaf)}
+  .web h3{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.15;letter-spacing:-.005em}
+  .web h3 em{font-style:italic}
+  .web.present h3 em{color:var(--sand-deep)}
+  .web.future h3 em{color:var(--leaf-deep)}
+  .web .biome{font-size:13px;color:var(--mute);font-style:italic;margin-top:-14px}
+
+  .trophic{display:grid;gap:0;margin-top:6px}
+  .level{
+    display:grid;grid-template-columns:140px 1fr;gap:24px;
+    padding:18px 0;border-top:1px solid var(--rule);align-items:start;
+  }
+  .level .lvl{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute);padding-top:3px;display:flex;align-items:center;gap:8px}
+  .level .lvl::before{
+    content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ink);
+  }
+  .level:nth-child(1) .lvl::before{background:#6fae5a}
+  .level:nth-child(2) .lvl::before{background:#c7a24a}
+  .level:nth-child(3) .lvl::before{background:#c86a2a}
+  .level:nth-child(4) .lvl::before{background:#7a3a11}
+  .level:nth-child(5) .lvl::before{background:#555}
+  .species-list{display:flex;flex-wrap:wrap;gap:8px}
+  .sp{
+    display:inline-flex;align-items:baseline;gap:6px;
+    padding:7px 12px;border:1px solid var(--rule);border-radius:999px;
+    font-size:13px;line-height:1;background:#fff;
+  }
+  .sp em{font-style:italic;color:var(--mute);font-size:11px}
+  .web.future .sp{background:#f5fbf3;border-color:#d8ead2}
+  .web.present .sp{background:#fbf6ec;border-color:#ecdfc4}
+
+  .web .arrows{
+    margin-top:auto;padding-top:20px;border-top:1px solid var(--rule);
+    display:flex;gap:20px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);
+  }
+  .web .arrows .leg{display:flex;align-items:center;gap:8px}
+  .web .arrows .leg svg{width:20px;height:10px}
+
+  /* ---------- Geology (tectonics + water) ---------- */
+  .geology{padding:140px 40px;background:#fff;border-top:1px solid var(--rule)}
+  .geology .head{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;margin-bottom:70px}
+  .geology h2{
+    font-family:var(--serif);font-weight:300;font-size:clamp(44px,5.5vw,80px);line-height:.98;letter-spacing:-.015em;
+    font-variation-settings:"opsz" 144;max-width:16ch;
+  }
+  .geology h2 em{font-style:italic;color:var(--sand-deep)}
+  .geology .head p{color:var(--mute);max-width:42ch;font-size:16px;line-height:1.6}
+
+  .geo-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:start}
+  .geo-stage{
+    border:1px solid var(--rule);background:#faf8f4;
+    aspect-ratio: 16/11;position:relative;overflow:hidden;
+  }
+  .geo-stage svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .geo-stage .ann{
+    position:absolute;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2);
+    padding:5px 9px;background:#fff;border:1px solid var(--rule);
+  }
+  .geo-stage .ann.a{top:12px;left:16px}
+  .geo-stage .ann.b{bottom:12px;left:16px}
+  .geo-stage .ann.c{top:12px;right:16px}
+  .geo-stage .ann.d{bottom:12px;right:16px}
+
+  .geo-copy{display:grid;gap:28px}
+  .geo-copy .block{border-top:1px solid var(--rule);padding-top:22px}
+  .geo-copy h4{
+    font-family:var(--serif);font-weight:400;font-size:24px;line-height:1.15;letter-spacing:-.005em;
+    margin-bottom:10px;
+  }
+  .geo-copy h4 em{font-style:italic}
+  .geo-copy p{font-size:14.5px;line-height:1.65;color:var(--ink-2)}
+  .geo-copy p strong{font-weight:500;color:var(--ink)}
+  .geo-copy .tag{
+    display:inline-block;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--mute);
+    margin-bottom:12px;
+  }
+
+  /* ---------- Migration ---------- */
+  .migration{padding:140px 40px;background:#0e0e0e;color:#fff;border-top:1px solid var(--rule)}
+  .migration .head{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;margin-bottom:70px}
+  .migration h2{
+    font-family:var(--serif);font-weight:300;font-size:clamp(44px,5.5vw,80px);line-height:.98;letter-spacing:-.015em;
+    font-variation-settings:"opsz" 144;max-width:15ch;
+  }
+  .migration h2 em{font-style:italic;color:#ffd7a8}
+  .migration .head p{color:rgba(255,255,255,.65);max-width:44ch;font-size:16px;line-height:1.65}
+
+  .mig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1)}
+  .mig{
+    background:#0e0e0e;padding:44px 36px;display:flex;flex-direction:column;gap:20px;min-height:420px;
+  }
+  .mig .dir{
+    display:flex;align-items:center;gap:12px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:rgba(255,255,255,.55);
+  }
+  .mig .dir svg{width:28px;height:10px}
+  .mig .dir.out svg{color:#ffb27a}
+  .mig .dir.stay svg{color:#e2c99a}
+  .mig .dir.in svg{color:#b6e5b9}
+  .mig h3{
+    font-family:var(--serif);font-weight:400;font-size:34px;line-height:1.05;letter-spacing:-.01em;
+    font-variation-settings:"opsz" 144;
+  }
+  .mig h3 em{font-style:italic}
+  .mig .who{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+  .mig .who .sp{
+    display:inline-flex;align-items:baseline;gap:6px;
+    padding:6px 10px;border-radius:999px;font-size:12.5px;line-height:1;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#fff;
+  }
+  .mig .who .sp em{font-style:italic;color:rgba(255,255,255,.55);font-size:11px}
+  .mig p{font-size:14px;line-height:1.65;color:rgba(255,255,255,.78)}
+  .mig p strong{color:#fff;font-weight:500}
+  .mig .why{
+    margin-top:auto;padding-top:22px;border-top:1px solid rgba(255,255,255,.14);
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.5);
+  }
+
+  /* ---------- Itinerary ---------- */
+  .itinerary{padding:140px 40px}
+  .it-head{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;margin-bottom:70px}
+  .it-head h2{
+    font-family:var(--serif);font-weight:300;font-size:clamp(44px,5.5vw,80px);line-height:.98;letter-spacing:-.015em;
+    font-variation-settings:"opsz" 144;max-width:14ch;
+  }
+  .it-head h2 em{font-style:italic}
+  .it-head p{color:var(--mute);max-width:42ch;font-size:16px;line-height:1.6}
+
+  .days{display:grid;gap:0;border-top:1px solid var(--ink)}
+  .day{
+    display:grid;grid-template-columns:120px 1fr 1.4fr 160px;gap:40px;
+    padding:36px 0;border-bottom:1px solid var(--rule);
+    align-items:start;
+    transition:background .2s ease;
+  }
+  .day:hover{background:#faf8f4}
+  .day .num{font-family:var(--serif);font-size:40px;font-weight:300;font-variation-settings:"opsz" 144}
+  .day .num em{font-style:italic;color:var(--mute);font-size:12px;display:block;margin-top:2px;letter-spacing:.2em;text-transform:uppercase;font-family:var(--sans);font-weight:500}
+  .day .ttl{font-family:var(--serif);font-size:26px;font-weight:400;line-height:1.2;letter-spacing:-.005em}
+  .day .ttl em{font-style:italic}
+  .day .desc{font-size:14px;line-height:1.6;color:var(--ink-2);max-width:46ch}
+  .day .meta{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);display:grid;gap:6px}
+
+  /* ---------- Booking ---------- */
+  .booking{padding:140px 40px;background:var(--ink);color:#fff}
+  .booking-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.2fr 1fr;gap:80px;align-items:end}
+  .booking h2{
+    font-family:var(--serif);font-weight:300;font-size:clamp(48px,6vw,96px);line-height:.98;letter-spacing:-.02em;
+    font-variation-settings:"opsz" 144;
+  }
+  .booking h2 em{font-style:italic;color:#ffd7a8}
+  .booking .eyebrow{color:rgba(255,255,255,.6)}
+  .booking .eyebrow::before{background:#fff}
+  .booking .rate{
+    display:grid;gap:18px;
+  }
+  .booking .rate .line{
+    display:flex;justify-content:space-between;padding:14px 0;
+    border-top:1px solid rgba(255,255,255,.18);
+    font-size:14px;
+  }
+  .booking .rate .line:last-child{border-bottom:1px solid rgba(255,255,255,.18)}
+  .booking .rate .line .k{color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.16em;font-size:11px;align-self:center}
+  .booking .rate .line .v{font-family:var(--serif);font-size:20px}
+  .booking .cta{
+    margin-top:28px;display:inline-flex;align-items:center;gap:14px;
+    background:#fff;color:var(--ink);
+    padding:18px 24px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;font-weight:500;
+    cursor:pointer;border:none;width:max-content;
+    transition:transform .2s ease, background .2s ease;
+  }
+  .booking .cta:hover{transform:translateX(4px)}
+  .booking .cta svg{width:22px;height:10px}
+
+  /* ---------- Footer ---------- */
+  footer{padding:50px 40px;border-top:1px solid var(--rule);background:#fff}
+  .foot{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;font-size:12px;color:var(--mute);letter-spacing:.06em;flex-wrap:wrap;gap:20px}
+  .foot .mark{font-family:var(--serif);font-size:16px;color:var(--ink);font-style:italic}
+
+  @media (max-width:900px){
+    .nav{padding:18px 22px}
+    .nav ul{display:none}
+    .section,.compare,.species,.itinerary,.booking,.cycles,.webs,.geology,.migration{padding-left:22px;padding-right:22px}
+    .intro-grid,.it-head,.booking-inner,.cycles .head,.webs .head,.geology .head,.migration .head{grid-template-columns:1fr;gap:32px}
+    .compare-grid{grid-template-columns:1fr}
+    .species-grid{grid-template-columns:repeat(2,1fr)}
+    .cycles-grid{grid-template-columns:repeat(2,1fr)}
+    .cycle{border-right:1px solid var(--rule)}
+    .cycle:nth-child(2n){border-right:0}
+    .cycle:nth-child(1),.cycle:nth-child(2){border-bottom:1px solid var(--rule)}
+    .webs-grid{grid-template-columns:1fr}
+    .geo-grid{grid-template-columns:1fr;gap:40px}
+    .mig-grid{grid-template-columns:1fr}
+    .day{grid-template-columns:1fr;gap:12px}
+    .hero-meta,.coords,.timeline{left:22px;right:22px}
+    .timeline{width:auto;right:22px}
+    .coords{bottom:auto;top:150px}
+    .timeline{bottom:30px}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="mark">Cairo <em>·</em> Deep Time</div>
+  <ul>
+    <li><a href="#present">Present</a></li>
+    <li><a href="#future">Future</a></li>
+    <li><a href="#geology">Geology</a></li>
+    <li><a href="#migration">Migration</a></li>
+    <li><a href="#species">Species</a></li>
+    <li><a href="#cycles">Cycles</a></li>
+    <li><a href="#webs">Food Webs</a></li>
+    <li><a href="#book">Book</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-sticky">
+    <div class="layer desert" id="layerDesert"></div>
+    <div class="layer temperate" id="layerTemperate"></div>
+
+    <!-- atmosphere -->
+    <canvas class="atmos" id="atmos"></canvas>
+
+    <div class="hero-vignette"></div>
+
+    <div class="hero-meta">
+      <span class="dot"></span>
+      <span id="heroEra">Present Day</span>
+      <em id="heroYear">— 2026 CE</em>
+    </div>
+
+    <div class="title-wrap">
+      <div>
+        <div class="kicker" id="kicker">A Tour Through Deep Time</div>
+        <div class="title">
+          <span class="fixed">Cairo: The</span>
+          <span class="swap">
+            <span class="spacer">Present</span>
+            <span class="word present" id="wordPresent">Present</span>
+            <span class="word future" id="wordFuture" style="opacity:0;transform:translateY(20px)">Future</span>
+          </span>
+        </div>
+        <div class="sub">
+          <span id="subA">30.0444° N</span>
+          <span id="subB">31.2357° E</span>
+          <span id="subC">Desert Biome</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="coords">
+      <span class="lbl">Coordinates</span>
+      <span class="val" id="coordsVal">30.04° N, 31.24° E <em>Africa</em></span>
+    </div>
+
+    <div class="timeline">
+      <div class="row">
+        <em id="tlLeft">2026 CE</em>
+        <em id="tlRight">+250,000,000 yrs</em>
+      </div>
+      <div class="track"><div class="fill" id="tlFill"></div></div>
+      <div class="ticks">
+        <span>Holocene</span>
+        <span>Eocene ±</span>
+        <span>Future</span>
+      </div>
+    </div>
+
+    <div class="scroll-cue">
+      <span>Scroll to travel</span>
+      <span class="line"></span>
+    </div>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section class="section" id="present">
+  <div class="container">
+    <div class="eyebrow">Chapter 01 · The City You Know</div>
+    <h1 class="lede">Cairo is a city of <em>sun and stone</em> — built on a desert, cradled by the Nile, and held in place by winds that have blown west-to-east for ten thousand years.</h1>
+
+    <div class="intro-grid">
+      <div>
+        <p>Today, Cairo sits at 30° north, squarely inside a band of dry subtropical air. Westerly winds roll in over North Africa carrying almost no moisture. The Mokattam Plateau to the east forces any stray air mass to descend, compress, and warm — a classic rain-shadow, and the reason the nearby desert is so extreme.</p>
+        <p>Seasons here come in two registers: a mild winter that hovers between 50 and 75°F, and a long, blunt summer that routinely breaks 95°F. Water is the Nile and the Nile alone — a green ribbon threading through an ochre world, feeding the canals, Lake Qarun, and the Wadi El Natrun basins on its way to the sea.</p>
+      </div>
+      <aside class="side">
+        <dl>
+          <dt>Winds</dt><dd>Westerlies<em>West → East, dry</em></dd>
+          <dt>Air Mass</dt><dd>Continental, arid<em>Descending, rain-shadowed</em></dd>
+          <dt>Water</dt><dd>Nile River<em>Qarun · Natrun · Canal</em></dd>
+          <dt>Biome</dt><dd>Hot desert<em>BWh — Köppen</em></dd>
+        </dl>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section class="compare" id="future">
+  <div class="container" style="max-width:none">
+    <div class="compare-grid">
+      <div class="compare-col present">
+        <div class="tag">Now · 2026 CE</div>
+        <h3>A <em>desert</em><br/>under westerlies.</h3>
+        <div style="margin:8px 0 18px">
+          <span class="climate-chip"><span class="swatch"></span>Hot desert</span>
+          <span class="climate-chip"><span class="swatch"></span>Dry air</span>
+          <span class="climate-chip"><span class="swatch"></span>Rain-shadow</span>
+        </div>
+        <div class="rows">
+          <div class="row-item"><div class="k">Coords</div><div class="v"><strong>30.04° N, 31.24° E</strong></div></div>
+          <div class="row-item"><div class="k">Seasons</div><div class="v">Two — mild winter (<strong>50–75°F</strong>) and a long hot summer (<strong>95°F+</strong>).</div></div>
+          <div class="row-item"><div class="k">Breezes</div><div class="v">None. Cairo is inland; no land/sea circulation.</div></div>
+          <div class="row-item"><div class="k">Water</div><div class="v">Nile · Cairo Canal · Lake Qarun · Wadi El Natrun.</div></div>
+          <div class="row-item"><div class="k">Terrain</div><div class="v">Mokattam Plateau forces descending, warming air — extreme aridity nearby.</div></div>
+        </div>
+      </div>
+
+      <div class="compare-col future">
+        <div class="tag">+250 Myr · Projection</div>
+        <h3>A <em>temperate</em><br/>upland, greening.</h3>
+        <div style="margin:8px 0 18px">
+          <span class="climate-chip"><span class="swatch"></span>Temperate</span>
+          <span class="climate-chip"><span class="swatch"></span>Wet air masses</span>
+          <span class="climate-chip"><span class="swatch"></span>Windward slope</span>
+        </div>
+        <div class="rows">
+          <div class="row-item"><div class="k">Coords</div><div class="v"><strong>35.1273° N, 54.9996° E</strong> — drifted north-east.</div></div>
+          <div class="row-item"><div class="k">Seasons</div><div class="v">Four distinct, mild — winter <strong>10–20°F</strong>, summer <strong>85–100°F</strong>.</div></div>
+          <div class="row-item"><div class="k">Breezes</div><div class="v">Still inland — no coastal breezes.</div></div>
+          <div class="row-item"><div class="k">Water</div><div class="v">New runoff from a windward range; the Nile is long gone.</div></div>
+          <div class="row-item"><div class="k">Terrain</div><div class="v">Cairo now sits on the <strong>windward</strong> side — ascending air, rain, forests.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPECIES -->
+<section class="species" id="species">
+  <div class="container">
+    <div class="head">
+      <h2>A roll call of <em>arrivals and departures.</em></h2>
+      <p>As the climate tilts from arid to temperate, Cairo's inhabitants turn over. Specialists leave. Generalists stay. New species walk in along the green front.</p>
+    </div>
+    <div class="species-grid">
+      <div class="species-card">
+        <div class="status gone">Departs</div>
+        <div class="glyph">ƒ</div>
+        <div>
+          <div class="name">Fennec Fox</div>
+          <div class="latin">Vulpes zerda</div>
+        </div>
+        <div class="note">Ears tuned for desert night air. Will not follow the biome as it greens.</div>
+      </div>
+      <div class="species-card">
+        <div class="status gone">Departs</div>
+        <div class="glyph">ʟ</div>
+        <div>
+          <div class="name">Spiny-tailed Lizard</div>
+          <div class="latin">Uromastyx aegyptia</div>
+        </div>
+        <div class="note">Thermoregulates on sun-baked rock — temperate shade is fatal.</div>
+      </div>
+      <div class="species-card">
+        <div class="status gone">Departs</div>
+        <div class="glyph">※</div>
+        <div>
+          <div class="name">Date Palm</div>
+          <div class="latin">Phoenix dactylifera</div>
+        </div>
+        <div class="note">Built for heat and aquifer — surrenders the ground to broadleafs.</div>
+      </div>
+      <div class="species-card">
+        <div class="status stay">Endures</div>
+        <div class="glyph">h</div>
+        <div>
+          <div class="name">Striped Hyena</div>
+          <div class="latin">Hyaena hyaena</div>
+        </div>
+        <div class="note">A generalist that already tolerates a wide range — adapts in place.</div>
+      </div>
+      <div class="species-card">
+        <div class="status stay">Endures</div>
+        <div class="glyph">m</div>
+        <div>
+          <div class="name">Egyptian Mongoose</div>
+          <div class="latin">Herpestes ichneumon</div>
+        </div>
+        <div class="note">Opportunistic and riparian — follows water into the new greener valleys.</div>
+      </div>
+      <div class="species-card">
+        <div class="status new">Arrives</div>
+        <div class="glyph">r</div>
+        <div>
+          <div class="name">Red Fox</div>
+          <div class="latin">Vulpes vulpes</div>
+        </div>
+        <div class="note">A temperate generalist expanding into newly hospitable terrain.</div>
+      </div>
+      <div class="species-card">
+        <div class="status new">Arrives</div>
+        <div class="glyph">†</div>
+        <div>
+          <div class="name">Golden Eagle</div>
+          <div class="latin">Aquila chrysaetos</div>
+        </div>
+        <div class="note">Uplift and upland forests — a raptor profile suddenly makes sense here.</div>
+      </div>
+      <div class="species-card">
+        <div class="status new">Arrives</div>
+        <div class="glyph">✿</div>
+        <div>
+          <div class="name">Oak</div>
+          <div class="latin">Quercus spp.</div>
+        </div>
+        <div class="note">Deciduous canopy takes hold as rainfall rises and frosts deepen.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GEOLOGY: tectonics & water -->
+<section class="geology" id="geology">
+  <div class="container">
+    <div class="head">
+      <h2>The <em>engine</em> behind the change.</h2>
+      <p>Cairo doesn't just warm or cool — it is <em>lifted</em>. As the African plate drives north into Eurasia, a new mountain range rises along the suture. Cairo, now on the windward flank, steps into a cooler latitude, catches the rain, and watches its water map redraw itself.</p>
+    </div>
+
+    <div class="geo-grid">
+      <div class="geo-stage" aria-hidden="true">
+        <svg viewBox="0 0 800 550" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f4eedf"/>
+              <stop offset="1" stop-color="#faf8f4"/>
+            </linearGradient>
+            <linearGradient id="wet" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#2f6a3a" stop-opacity=".15"/>
+              <stop offset="1" stop-color="#2f6a3a" stop-opacity=".02"/>
+            </linearGradient>
+            <linearGradient id="dry" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#c86a2a" stop-opacity=".18"/>
+              <stop offset="1" stop-color="#c86a2a" stop-opacity=".02"/>
+            </linearGradient>
+          </defs>
+
+          <!-- sky -->
+          <rect width="800" height="550" fill="url(#sky)"/>
+
+          <!-- windward wet wash -->
+          <path d="M0,360 L420,360 L420,550 L0,550 Z" fill="url(#wet)"/>
+          <!-- lee dry wash -->
+          <path d="M420,360 L800,360 L800,550 L420,550 Z" fill="url(#dry)"/>
+
+          <!-- mountain range -->
+          <path d="M120,440 L260,280 L340,340 L420,180 L520,320 L600,260 L720,420 L800,440 L800,550 L0,550 Z"
+                fill="#1e1e1e"/>
+          <!-- snowline -->
+          <path d="M210,340 L260,280 L340,340 L400,240 L420,180 L480,260 L520,320 L560,300 L600,260 L660,340"
+                fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round" opacity=".85"/>
+
+          <!-- westerly arrows flowing up windward, down leeward -->
+          <g fill="none" stroke="#0e0e0e" stroke-width="1.4" stroke-linecap="round">
+            <path d="M30,200 C140,180 220,240 300,170" marker-end="url(#ar)"/>
+            <path d="M20,260 C120,250 200,300 290,230" marker-end="url(#ar)"/>
+            <path d="M20,330 C140,330 220,360 300,310" marker-end="url(#ar)"/>
+            <!-- descending lee side -->
+            <path d="M520,170 C580,230 640,280 740,340" marker-end="url(#ar)"/>
+            <path d="M560,200 C620,260 680,310 770,380" marker-end="url(#ar)"/>
+          </g>
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#0e0e0e"/>
+            </marker>
+          </defs>
+
+          <!-- rain on windward -->
+          <g stroke="#3a6d8a" stroke-width="1.2" stroke-linecap="round" opacity=".7">
+            <line x1="80"  y1="230" x2="72"  y2="260"/>
+            <line x1="120" y1="250" x2="112" y2="285"/>
+            <line x1="160" y1="230" x2="152" y2="262"/>
+            <line x1="200" y1="270" x2="192" y2="302"/>
+            <line x1="250" y1="250" x2="242" y2="285"/>
+            <line x1="300" y1="290" x2="292" y2="322"/>
+          </g>
+          <!-- new lake (windward) -->
+          <ellipse cx="180" cy="490" rx="110" ry="12" fill="#3a6d8a" opacity=".55"/>
+          <ellipse cx="180" cy="486" rx="90"  ry="7"  fill="#3a6d8a" opacity=".35"/>
+
+          <!-- sun on lee -->
+          <circle cx="700" cy="120" r="26" fill="#c86a2a" opacity=".25"/>
+          <circle cx="700" cy="120" r="14" fill="#c86a2a" opacity=".55"/>
+
+          <!-- labels -->
+          <g font-family="Inter,system-ui,sans-serif" font-size="11" fill="#0e0e0e" letter-spacing=".18em">
+            <text x="40"  y="60"  text-transform="uppercase">CAIRO · WINDWARD</text>
+            <text x="600" y="60"  text-transform="uppercase">LEE · NEW DESERT</text>
+            <text x="360" y="160" text-anchor="middle" text-transform="uppercase">RISING RANGE</text>
+            <text x="180" y="530" text-anchor="middle" text-transform="uppercase" fill="#3a6d8a">NEW BASIN</text>
+          </g>
+
+          <!-- Cairo marker -->
+          <g transform="translate(220,445)">
+            <circle r="5" fill="#0e0e0e"/>
+            <circle r="11" fill="none" stroke="#0e0e0e" stroke-width="1" opacity=".5"/>
+            <text x="14" y="4" font-family="Fraunces,serif" font-style="italic" font-size="14">Cairo</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="geo-copy">
+        <div class="block">
+          <div class="tag">01 · Tectonic Plates</div>
+          <h4>Africa drives north into <em>Eurasia.</em></h4>
+          <p>Today Cairo sits on the northern edge of the African plate, with the Eurasian plate holding the Mediterranean between them. As the two plates continue to converge, they <strong>clash and buckle</strong>, lifting a new mountain range along the collision zone. Cairo rides the crust upward and northward, away from the equator and into cooler, less directly-lit latitudes.</p>
+        </div>
+        <div class="block">
+          <div class="tag">02 · Wind &amp; Rain</div>
+          <h4>Cairo on the <em>windward</em> side.</h4>
+          <p>The Westerlies now strike the new range on <strong>Cairo's side first</strong>. Air is forced upward, cools, and drops its moisture as rain and snow — the classic <strong>orographic</strong> wet flank. The descending side becomes the new rain-shadow desert, so the climate that currently belongs to Cairo migrates <em>across</em> the range.</p>
+        </div>
+        <div class="block">
+          <div class="tag">03 · Bodies of Water</div>
+          <h4>New rivers, <em>new basins.</em></h4>
+          <p>Reliable rainfall and spring-melt carve fresh drainage networks off the range. Valleys fill with <strong>alpine lakes</strong> and perennial streams; the old Nile is long gone, but the windward flank hosts an entirely new water map — the source of the temperate forest's stability.</p>
+        </div>
+        <div class="block">
+          <div class="tag">04 · Soil Chemistry</div>
+          <h4>Weathering loads <em>the ground.</em></h4>
+          <p>Extra moisture in air and soil accelerates <strong>geological weathering</strong>. Freshly exposed mountain minerals — phosphorus, potassium, calcium — break down into the soil column, fertilising it and opening a niche for broadleaf forest. Old desert specialists can't compete; new temperate lineages flourish.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MIGRATION -->
+<section class="migration" id="migration">
+  <div class="container">
+    <div class="head">
+      <h2>Three <em>migrations,</em> one climate.</h2>
+      <p>As Cairo tilts from hot desert to temperate upland, its living fauna sorts itself into three groups — those that <em>leave</em>, those that <em>adapt in place</em>, and those that <em>walk in</em> along the green front.</p>
+    </div>
+
+    <div class="mig-grid">
+
+      <!-- Emigrants -->
+      <div class="mig">
+        <div class="dir out">
+          <svg viewBox="0 0 30 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <path d="M28 5H2M6 1L2 5l4 4"/>
+          </svg>
+          Emigrants · Desert specialists
+        </div>
+        <h3>The <em>specialists</em> leave.</h3>
+        <div class="who">
+          <span class="sp">Fennec Fox <em>Vulpes zerda</em></span>
+          <span class="sp">Spiny-tailed Lizard <em>Uromastyx aegyptia</em></span>
+          <span class="sp">Date Palm <em>Phoenix dactylifera</em></span>
+        </div>
+        <p>These lineages are evolutionarily optimised for <strong>arid conditions and temperatures above 100°F</strong>. As tectonic movement carries Cairo into cooler, more temperate latitudes, heat-dependent organisms lose out in local competition. Over millions of years their populations drift toward the <strong>new equatorial zones</strong> — wherever their narrow niche still exists.</p>
+        <div class="why">Drift · heat · narrow niche</div>
+      </div>
+
+      <!-- Residents -->
+      <div class="mig">
+        <div class="dir stay">
+          <svg viewBox="0 0 30 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <circle cx="15" cy="5" r="3.5"/>
+            <path d="M3 5h6M21 5h6"/>
+          </svg>
+          Residents · Generalists
+        </div>
+        <h3>The <em>generalists</em> stay.</h3>
+        <div class="who">
+          <span class="sp">Striped Hyena <em>Hyaena hyaena</em></span>
+          <span class="sp">Egyptian Mongoose <em>Herpestes ichneumon</em></span>
+        </div>
+        <p>The descendants of the <strong>striped hyena</strong> and <strong>Egyptian mongoose</strong> remain through sheer <strong>biological plasticity</strong>. Neither is tied to a single food source or a narrow temperature range. Rather than fleeing the cooling climate, they evolve alongside it — adjusting diet, hunting behaviour, and physiology to match the changing landscape.</p>
+        <div class="why">Plasticity · wide diet · adapt in place</div>
+      </div>
+
+      <!-- Immigrants -->
+      <div class="mig">
+        <div class="dir in">
+          <svg viewBox="0 0 30 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <path d="M2 5h26M24 1l4 4-4 4"/>
+          </svg>
+          Immigrants · Forest pioneers
+        </div>
+        <h3>Temperate <em>pioneers</em> walk in.</h3>
+        <div class="who">
+          <span class="sp">Oak <em>Quercus spp.</em></span>
+          <span class="sp">Golden Eagle <em>Aquila chrysaetos</em></span>
+          <span class="sp">Red Fox <em>Vulpes vulpes</em></span>
+        </div>
+        <p>As the region transforms into a cooler, greener biome, species adapted to stable, high-vegetation environments <strong>move in</strong>. The <strong>oak</strong> expands its range through seed dispersal as soils enrich and climate mildens. The <strong>golden eagle</strong> and <strong>red fox</strong> fill the predatory niches left behind, following an explosion of forest-dwelling prey replacing the old desert fauna.</p>
+        <div class="why">Dispersal · new niches · rich soil</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- NUTRIENT CYCLES -->
+<section class="cycles" id="cycles">
+  <div class="container">
+    <div class="head">
+      <h2>The forest's <em>nutrient cycles.</em></h2>
+      <p>In the Cairo of +250 million years, a temperate oak forest builds itself out of four overlapping loops — carbon, nitrogen, phosphorus, and water. Each one pulls material from air, stone, or flesh and folds it into the living ground.</p>
+    </div>
+
+    <div class="cycles-grid">
+      <div class="cycle">
+        <div class="ring">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 14c0-4 3-7 8-7 3 0 5 2 5 4s-1 3-3 3h-3"/><path d="M8 18c1 1 3 2 5 2"/><circle cx="18" cy="6" r="1"/></svg>
+        </div>
+        <div class="label">01 · Carbon</div>
+        <h4>Oak forests as <em>carbon sinks.</em></h4>
+        <p>Massive oak stands pull <strong>CO₂</strong> from the atmosphere and lock it into their wooden trunks. Fallen carbon settles into a thick <strong>O-horizon</strong>, where fungi and decomposers recycle it back into stable, lush soil.</p>
+      </div>
+
+      <div class="cycle">
+        <div class="ring">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M5 18V6l14 12V6"/></svg>
+        </div>
+        <div class="label">02 · Nitrogen</div>
+        <h4>Nitrogen hotspots from <em>hyena &amp; mongoose.</em></h4>
+        <p>Waste and carcasses of <strong>striped hyenas</strong> and <strong>mongooses</strong> create local nitrogen hotspots. Soil bacteria convert it through <strong>biotic exchange</strong> into plant-usable forms, fertilising winter wheat and the forest floor.</p>
+      </div>
+
+      <div class="cycle">
+        <div class="ring">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 20l5-10 4 6 3-4 6 8"/><path d="M14 4l3 3-3 3"/></svg>
+        </div>
+        <div class="label">03 · Phosphorus</div>
+        <h4>Rain on new <em>mountain stone.</em></h4>
+        <p>Rain washes over the freshly risen mountains, releasing phosphorus-rich minerals through <strong>geological weathering</strong>. These nutrients flow directly into the forest, where root systems absorb them to fuel sustained growth.</p>
+      </div>
+
+      <div class="cycle">
+        <div class="ring">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 3c3 4 6 7 6 11a6 6 0 1 1-12 0c0-4 3-7 6-11z"/></svg>
+        </div>
+        <div class="label">04 · Water</div>
+        <h4>An orographic <em>transpiration loop.</em></h4>
+        <p>Moist air rises over the highlands, cools, and falls as <strong>orographic rainfall</strong>. Oaks and understorey return moisture through <strong>transpiration</strong>, reinforcing the loop and stabilising Cairo's new water supply.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOD WEBS -->
+<section class="webs" id="webs">
+  <div class="container">
+    <div class="head">
+      <h2>Two <em>food webs,</em> two Cairos.</h2>
+      <p>Same latitude, same city name, separated by 250 million years of continental drift, mountain-building, and rainfall. The trophic levels hold — but the names of who eats whom change completely.</p>
+    </div>
+
+    <div class="webs-grid">
+
+      <!-- PRESENT WEB -->
+      <div class="web present">
+        <div class="era"><span class="sw"></span>Now · 2026 CE</div>
+        <h3>Arid &amp; <em>riverine.</em></h3>
+        <div class="biome">Nile floodplain · desert scrub · dry plateau</div>
+
+        <div class="trophic">
+          <div class="level">
+            <div class="lvl">Producers</div>
+            <div class="species-list">
+              <span class="sp">Common Reed <em>Phragmites australis</em></span>
+              <span class="sp">Date Palm <em>Phoenix dactylifera</em></span>
+              <span class="sp">Desert Scrub</span>
+            </div>
+          </div>
+          <div class="level">
+            <div class="lvl">Primary</div>
+            <div class="species-list">
+              <span class="sp">Roof Rat <em>Rattus rattus</em></span>
+              <span class="sp">Muskrat <em>Ondatra zibethicus</em></span>
+              <span class="sp">Spiny-tailed Lizard <em>Uromastyx aegyptia</em></span>
+            </div>
+          </div>
+          <div class="level">
+            <div class="lvl">Secondary</div>
+            <div class="species-list">
+              <span class="sp">Barn Owl <em>Tyto alba</em></span>
+              <span class="sp">Red Fox <em>Vulpes vulpes</em></span>
+              <span class="sp">Egyptian Mongoose <em>Herpestes ichneumon</em></span>
+            </div>
+          </div>
+          <div class="level">
+            <div class="lvl">Tertiary</div>
+            <div class="species-list">
+              <span class="sp">Eurasian Eagle-Owl <em>Bubo bubo</em></span>
+            </div>
+          </div>
+          <div class="level">
+            <div class="lvl">Decomposers</div>
+            <div class="species-list">
+              <span class="sp">Dung Beetle <em>Scarabaeus sacer</em></span>
+              <span class="sp">Desert Termites <em>Psammotermes</em></span>
+              <span class="sp">Xerophilic Fungi</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="arrows">
+          <div class="leg">
+            <svg viewBox="0 0 22 10" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M0 5h20M16 1l5 4-5 4"/></svg>
+            Energy flows upward
+          </div>
+        </div>
+      </div>
+
+      <!-- FUTURE WEB -->
+      <div class="web future">
+        <div class="era"><span class="sw"></span>+250 Myr · Projected</div>
+        <h3>Temperate <em>mountain slope.</em></h3>
+        <div class="biome">Oak forest · windward rain · permanent runoff</div>
+
+        <div class="trophic">
+          <div class="level">
+            <div class="lvl">Producers</div>
+            <div class="species-list">
+              <span class="sp">Oak <em>Quercus spp.</em></span>
+              <span class="sp">Temperate Shrubs</span>
+              <span class="sp">Common Reed <em>Phragmites australis</em></span>
+            </div>
+          </div>
+          <div class="level">
+            <div class="lvl">Primary</div>
+            <div class="species-list">
+              <span class="sp">Wood Mouse <em>Apodemus sylvaticus</em></span>
+              <span class="sp">Roof Rat <em>Rattus rattus</em></span>
+              <span class="sp">Muskrat <em>Ondatra zibethicus</em></span>
+              <span class="sp">Red Deer <em>Cervus elaphus</em></span>
+            </div>
+          </div>
+          <div class="level">
+            <div class="lvl">Secondary</div>
+            <div class="species-list">
+              <span class="sp">Red Fox <em>Vulpes vulpes</em></span>
+              <span class="sp">Barn Owl <em>Tyto alba</em></span>
+              <span class="sp">Egyptian Mongoose <em>Herpestes ichneumon</em></span>
+            </div>
+          </div>
+          <div class="level">
+            <div class="lvl">Tertiary</div>
+            <div class="species-list">
+              <span class="sp">Golden Eagle <em>Aquila chrysaetos</em></span>
+              <span class="sp">Eurasian Eagle-Owl <em>Bubo bubo</em></span>
+            </div>
+          </div>
+          <div class="level">
+            <div class="lvl">Decomposers</div>
+            <div class="species-list">
+              <span class="sp">Mycorrhizal Fungi <em>Russula · Amanita</em></span>
+              <span class="sp">Earthworms <em>Lumbricus terrestris</em></span>
+              <span class="sp">Bracket Fungi <em>Fomes fomentarius</em></span>
+              <span class="sp">Springtails <em>Collembola</em></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="arrows">
+          <div class="leg">
+            <svg viewBox="0 0 22 10" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M0 5h20M16 1l5 4-5 4"/></svg>
+            Energy flows upward
+          </div>
+          <div class="leg">
+            <svg viewBox="0 0 22 10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2"><path d="M20 5H0M4 1L-1 5l5 4"/></svg>
+            Decomposers return it
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ITINERARY -->
+<section class="itinerary" id="itinerary">
+  <div class="container">
+    <div class="it-head">
+      <h2>Your <em>itinerary</em><br/>— now and then.</h2>
+      <p>Four days on foot through the Cairo of today, and four imagined days across the Cairo of <em>+250,000,000</em> years. Booked as one journey, bookended by deep time.</p>
+    </div>
+
+    <div class="days">
+      <div class="day">
+        <div class="num">01 <em>Present</em></div>
+        <div class="ttl">The <em>Nile</em> at sunrise.</div>
+        <div class="desc">Board a felucca at dawn, watch the westerlies skim the river, then climb to the Mokattam escarpment for the rain-shadow up close.</div>
+        <div class="meta"><span>Heat · 96°F</span><span>Dry</span><span>Low water</span></div>
+      </div>
+      <div class="day">
+        <div class="num">02 <em>Present</em></div>
+        <div class="ttl">Into the <em>Wadi El Natrun.</em></div>
+        <div class="desc">Salt lakes, monasteries, and a walk along the last great desert road. The quiet is the point.</div>
+        <div class="meta"><span>Heat · 98°F</span><span>Arid</span><span>Salt flats</span></div>
+      </div>
+      <div class="day">
+        <div class="num">03 <em>Present</em></div>
+        <div class="ttl">Lake <em>Qarun</em> & the canal.</div>
+        <div class="desc">A slow day on still water — an inland echo of what Cairo's future climate will one day hold year-round.</div>
+        <div class="meta"><span>Heat · 92°F</span><span>Humid pocket</span><span>Birds</span></div>
+      </div>
+      <div class="day">
+        <div class="num">04 <em>Future</em></div>
+        <div class="ttl">The <em>green</em> escarpment.</div>
+        <div class="desc">Imagined — a moss-wet upland on the windward flank of a new range. Oak canopies, hyena tracks, golden eagles above.</div>
+        <div class="meta"><span>Cool · 68°F</span><span>Wet</span><span>Forest</span></div>
+      </div>
+      <div class="day">
+        <div class="num">05 <em>Future</em></div>
+        <div class="ttl">Four <em>seasons</em> in a day.</div>
+        <div class="desc">A storytelling walk through what "mild winter" and "four seasons" feel like when your city has only ever known two.</div>
+        <div class="meta"><span>10–20°F (Jan)</span><span>85–100°F (Jul)</span><span>Snowline near</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section class="booking" id="book">
+  <div class="booking-inner">
+    <div>
+      <div class="eyebrow" style="color:rgba(255,255,255,.6)"><span style="background:#fff;display:inline-block;width:28px;height:1px"></span>&nbsp;&nbsp;&nbsp;Book the tour</div>
+      <h2>Walk Cairo <em>twice</em> — once as it is, once as it will be.</h2>
+    </div>
+    <div class="rate">
+      <div class="line"><span class="k">Duration</span><span class="v">5 days · 4 nights</span></div>
+      <div class="line"><span class="k">Group</span><span class="v">8 travelers · small</span></div>
+      <div class="line"><span class="k">Departs</span><span class="v">Monthly · Oct – Apr</span></div>
+      <div class="line"><span class="k">From</span><span class="v">USD $2,480 pp</span></div>
+      <div class="cta" style="background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.25);cursor:default">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ffd7a8;box-shadow:0 0 0 4px rgba(255,215,168,.18)"></span>
+        Booking opening soon
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot">
+    <div class="mark">Cairo · Deep Time Tours</div>
+    <div>By Choppa Purandhar Ram, Evan James, Rayhaan Magloob, Aarush Nallamilli, and Aanirudh Dinesh</div>
+    <div><a href="https://docs.google.com/document/d/1QD16K3yCrWdh0Xf7gxu5Vd4xtzo4xejJ_gSfmlw645w/edit?usp=sharing" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:2px">Our Work Document →</a></div>
+    <div>© 2026 — Projections after Scotese plate reconstructions</div>
+  </div>
+</footer>
+
+<div id="tweaks-root"></div>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel">
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "nameGap": 14,
+    "latinSize": 13,
+    "latinColor": "#8a8a8a",
+    "cardPadding": 22,
+    "cardGap": 18
+  }/*EDITMODE-END*/;
+
+  function TweaksApp(){
+    const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+    React.useEffect(() => {
+      const root = document.documentElement;
+      root.style.setProperty('--name-gap', t.nameGap + 'px');
+
+      // apply the rest via a dynamic style block so we stay within CSS vars
+      let el = document.getElementById('__twk_style');
+      if(!el){ el = document.createElement('style'); el.id = '__twk_style'; document.head.appendChild(el); }
+      el.textContent = `
+        .species-card .latin{ font-size:${t.latinSize}px; color:${t.latinColor}; }
+        .species-card{ padding:${t.cardPadding}px; gap:${t.cardGap}px; }
+      `;
+    }, [t]);
+
+    return (
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Species cards" />
+        <TweakSlider label="Gap under name" value={t.nameGap} min={0} max={32} step={1} unit="px"
+                     onChange={(v)=>setTweak('nameGap', v)} />
+        <TweakSlider label="Latin name size" value={t.latinSize} min={10} max={20} step={1} unit="px"
+                     onChange={(v)=>setTweak('latinSize', v)} />
+        <TweakColor  label="Latin color" value={t.latinColor}
+                     onChange={(v)=>setTweak('latinColor', v)} />
+        <TweakSection label="Card layout" />
+        <TweakSlider label="Card padding" value={t.cardPadding} min={12} max={36} step={1} unit="px"
+                     onChange={(v)=>setTweak('cardPadding', v)} />
+        <TweakSlider label="Inner gap" value={t.cardGap} min={8} max={28} step={1} unit="px"
+                     onChange={(v)=>setTweak('cardGap', v)} />
+      </TweaksPanel>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('tweaks-root')).render(<TweaksApp/>);
+</script>
+
+<script>
+(() => {
+  // --- scroll driven hero transition ---
+  const hero        = document.getElementById('hero');
+  const desert      = document.getElementById('layerDesert');
+  const temperate   = document.getElementById('layerTemperate');
+  const wordPresent = document.getElementById('wordPresent');
+  const wordFuture  = document.getElementById('wordFuture');
+  const kicker      = document.getElementById('kicker');
+  const heroEra     = document.getElementById('heroEra');
+  const heroYear    = document.getElementById('heroYear');
+  const coordsVal   = document.getElementById('coordsVal');
+  const subA        = document.getElementById('subA');
+  const subB        = document.getElementById('subB');
+  const subC        = document.getElementById('subC');
+  const tlLeft      = document.getElementById('tlLeft');
+  const tlRight     = document.getElementById('tlRight');
+  const tlFill      = document.getElementById('tlFill');
+
+  const lerp = (a,b,t) => a + (b-a)*t;
+  const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+  const ease = t => t<.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
+
+  function onScroll(){
+    const rect = hero.getBoundingClientRect();
+    const total = hero.offsetHeight - window.innerHeight;
+    const raw = clamp(-rect.top / total, 0, 1);
+    const t = ease(raw);
+
+    // crossfade layers
+    temperate.style.opacity = t.toFixed(3);
+    // subtle parallax zoom on desert as it recedes
+    desert.style.transform    = `scale(${(1 + 0.08*t).toFixed(3)})`;
+    desert.style.filter       = `saturate(${(1 - 0.25*t).toFixed(2)}) brightness(${(1 - 0.1*t).toFixed(2)})`;
+    temperate.style.transform = `scale(${(1.08 - 0.08*t).toFixed(3)})`;
+
+    // title swap
+    // present fades out 0 -> .45, future fades in .45 -> .9
+    const pOut = clamp((t - 0.05) / 0.35, 0, 1);
+    const fIn  = clamp((t - 0.45) / 0.35, 0, 1);
+    wordPresent.style.opacity   = (1 - pOut).toFixed(3);
+    wordPresent.style.transform = `translateY(${(-pOut*24).toFixed(1)}px)`;
+    wordPresent.style.filter    = `blur(${(pOut*6).toFixed(1)}px)`;
+    wordFuture.style.opacity    = fIn.toFixed(3);
+    wordFuture.style.transform  = `translateY(${((1-fIn)*28).toFixed(1)}px)`;
+    wordFuture.style.filter     = `blur(${((1-fIn)*6).toFixed(1)}px)`;
+
+    // era text
+    heroEra.textContent = t < 0.5 ? 'Present Day' : 'Projected — +250 Myr';
+    const year = Math.round(lerp(2026, 250002026, t));
+    heroYear.textContent = t < 0.02 ? '— 2026 CE' : `— ${year.toLocaleString()} CE`;
+
+    // sub line
+    const lat = lerp(30.0444, 35.1273, t).toFixed(4);
+    const lon = lerp(31.2357, 54.9996, t).toFixed(4);
+    subA.textContent = `${lat}° N`;
+    subB.textContent = `${lon}° E`;
+    subC.textContent = t < 0.5 ? 'Desert Biome' : 'Temperate Upland';
+    coordsVal.innerHTML = `${lat}° N, ${lon}° E <em>${t<.5?'Africa':'Eurasian margin'}</em>`;
+
+    tlFill.style.right = `${(100*(1-t)).toFixed(1)}%`;
+    kicker.textContent = t < 0.5
+      ? 'A Tour Through Deep Time'
+      : 'Two Hundred Fifty Million Years Later';
+  }
+  // nav becomes solid once the hero transition is essentially done
+  const navEl = document.querySelector('.nav');
+  function updateNav(){
+    const rect = hero.getBoundingClientRect();
+    const total = hero.offsetHeight - window.innerHeight;
+    const raw = clamp(-rect.top / total, 0, 1);
+    // solid once transition is ~past (0.85 of the scroll distance)
+    if(raw > 0.85) navEl.classList.add('solid');
+    else navEl.classList.remove('solid');
+  }
+  window.addEventListener('scroll', () => { onScroll(); updateNav(); }, {passive:true});
+  window.addEventListener('resize', () => { onScroll(); updateNav(); });
+  onScroll(); updateNav();
+
+  // --- atmospheric particles (sand -> leaves) ---
+  const cvs = document.getElementById('atmos');
+  const ctx = cvs.getContext('2d');
+  let W, H, parts = [];
+  function size(){
+    W = cvs.width  = cvs.clientWidth  * devicePixelRatio;
+    H = cvs.height = cvs.clientHeight * devicePixelRatio;
+  }
+  size();
+  window.addEventListener('resize', size);
+
+  for(let i=0;i<70;i++){
+    parts.push({
+      x: Math.random(),
+      y: Math.random(),
+      vx: 0.0005 + Math.random()*0.0015,
+      vy: (Math.random()-0.5)*0.0004,
+      r: 0.6 + Math.random()*1.8,
+      phase: Math.random()*Math.PI*2,
+    });
+  }
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    // transition param
+    const rect = hero.getBoundingClientRect();
+    const total = hero.offsetHeight - window.innerHeight;
+    const t = clamp(-rect.top / total, 0, 1);
+    const sandColor = `rgba(255, 220, 170, ${0.75*(1-t)})`;
+    const leafColor = `rgba(180, 230, 180, ${0.8*t})`;
+
+    parts.forEach(p=>{
+      p.x += p.vx + (t*0.0008); // leaves fall faster downwind
+      p.y += p.vy + Math.sin(p.phase + performance.now()*0.0008)*0.0004 + t*0.0006;
+      p.phase += 0.02;
+      if(p.x>1.02) p.x = -0.02;
+      if(p.y>1.05) p.y = -0.05;
+      if(p.y<-0.05) p.y = 1.05;
+      const px = p.x*W, py = p.y*H;
+      // sand (small dots)
+      ctx.beginPath();
+      ctx.fillStyle = sandColor;
+      ctx.arc(px,py,p.r*devicePixelRatio,0,Math.PI*2);
+      ctx.fill();
+      // leaves (tiny rects rotated)
+      if(t>0.02){
+        ctx.save();
+        ctx.translate(px,py);
+        ctx.rotate(p.phase);
+        ctx.fillStyle = leafColor;
+        ctx.fillRect(-p.r*devicePixelRatio, -p.r*0.4*devicePixelRatio, p.r*2.4*devicePixelRatio, p.r*0.8*devicePixelRatio);
+        ctx.restore();
+      }
+    });
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
+
+</body>
+</html>

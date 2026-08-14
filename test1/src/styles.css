@@ -1,0 +1,174 @@
+:root{
+  /* palette — off the neon-on-black default: ink + bone, lime as a hairline only */
+  --ink:#0B0F0D; --bone:#ECE7DA; --court:#0E5C3F; --lime:#C8FF3D; --ash:#8A8F86;
+  /* one Archivo superfamily: Expanded heavy for display, normal for body + labels */
+  --display:'Archivo',sans-serif; --body:'Archivo',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body,#root{width:100%;height:100%}
+body{
+  background:#000; color:var(--bone); font-family:var(--body); font-weight:400;
+  -webkit-font-smoothing:antialiased; overflow:hidden;
+}
+canvas{display:block;touch-action:none}
+::selection{background:var(--lime);color:var(--ink)}
+
+/* display = Archivo Expanded, heavy + wide (the architectural look) */
+.disp{font-family:var(--display);font-stretch:125%;font-weight:800;text-transform:uppercase;letter-spacing:.005em;line-height:.9}
+/* labels = Archivo, tracked (replaces the mono-eyebrow default) */
+.mono{font-family:var(--body);font-stretch:100%;font-weight:600;font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ash)}
+
+/* ---------- overlay (DOM text above the canvas) ---------- */
+.overlay{position:fixed;inset:0;z-index:10;pointer-events:none}
+
+.topbar{position:absolute;inset:20px 26px auto 26px;display:flex;justify-content:space-between;align-items:center;mix-blend-mode:difference}
+.topbar .brand{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:1.15rem;letter-spacing:.1em;text-transform:uppercase;color:#fff}
+.topbar .tag{font-family:var(--body);font-weight:600;font-size:.64rem;letter-spacing:.26em;text-transform:uppercase;color:#fff;opacity:.85}
+@media(max-width:560px){.topbar .tag{display:none}}
+
+/* each cinematic caption is centered & cross-faded by JS */
+.beat{position:absolute;left:0;right:0;padding:0 24px;text-align:center;opacity:0;transition:opacity .15s linear;will-change:opacity}
+.beat.b-hero   {top:30%}
+.beat.b-impact {top:34%}
+.beat.b-cta    {top:32%}
+
+.beat .ey{margin-bottom:20px}
+.beat .big{font-family:var(--display);font-stretch:125%;font-weight:800;text-transform:uppercase;line-height:.9;letter-spacing:.01em;color:var(--bone)}
+.b-hero  .big{font-size:clamp(2.6rem,10vw,8rem)}
+.b-impact .big{font-size:clamp(2.6rem,9vw,7rem)}
+.b-impact .unit{font-size:.32em;color:var(--lime);vertical-align:super;font-weight:600;letter-spacing:.04em;font-stretch:100%}
+.beat .sub{margin-top:20px;color:var(--ash);font-size:clamp(.95rem,1.4vw,1.12rem);line-height:1.6;max-width:44ch;margin-inline:auto}
+
+.cta{margin-top:32px;pointer-events:auto;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cta .btn{font-family:var(--body);font-weight:600;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
+  padding:15px 26px;border:1px solid rgba(236,231,218,.4);color:var(--bone);background:transparent;cursor:pointer;
+  transition:transform .2s ease, background .2s ease, border-color .2s ease, color .2s ease}
+.cta .btn.fill{background:var(--bone);color:var(--ink);border-color:var(--bone)}
+/* micro-interactions (modern-web-design: hover lift + tap press, 200ms, GPU transforms) */
+.cta .btn:hover{transform:translateY(-2px);border-color:var(--lime)}
+.cta .btn.fill:hover{background:var(--lime);border-color:var(--lime)}
+.cta .btn:active{transform:translateY(0) scale(.97)}
+
+/* accessibility: visible keyboard focus */
+:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+
+/* scroll cue + footer */
+.cue{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.8;transition:opacity .3s}
+.cue .bar{width:1px;height:38px;background:linear-gradient(var(--lime),transparent);animation:cue 2s ease-in-out infinite}
+@keyframes cue{0%{opacity:0;transform:scaleY(.2);transform-origin:top}50%{opacity:1}100%{opacity:0;transform-origin:top}}
+
+.footer{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;
+  padding:16px 26px;font-family:var(--body);font-weight:600;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ash);opacity:0;transition:opacity .3s}
+
+/* loader */
+.loader{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:#000;color:var(--bone)}
+.loader .l-brand{font-family:var(--display);font-stretch:125%;font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:clamp(2rem,8vw,5rem)}
+.loader .l-pct{font-family:var(--body);font-weight:600;font-size:.78rem;letter-spacing:.2em;color:var(--ash);margin-top:12px}
+
+/* ---------- 4-part racket captions (right side, Ciao-style) ---------- */
+.partblock{
+  position:absolute; right:clamp(24px,8vw,120px); top:50%; transform:translateY(-50%);
+  max-width:26ch; text-align:left; opacity:0; transition:opacity .15s linear; will-change:opacity;
+}
+.partblock .ey{margin-bottom:16px}
+.partblock .big{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:clamp(1.9rem,4.6vw,3.4rem); line-height:.92; letter-spacing:.01em; margin-bottom:18px; color:var(--bone)}
+.partblock .sub{margin:0; text-align:left; color:var(--ash); font-size:clamp(.95rem,1.3vw,1.08rem); line-height:1.6}
+@media(max-width:760px){
+  .partblock{right:0; left:0; top:auto; bottom:14%; transform:none; max-width:none; text-align:center; padding:0 24px}
+  .partblock .sub{text-align:center}
+}
+
+/* right-side ink scrim for caption legibility over busy 3D */
+.scrim{position:absolute;inset:0;opacity:0;transition:opacity .4s;pointer-events:none;
+  background:linear-gradient(100deg, transparent 48%, rgba(11,15,13,.72) 100%)}
+
+/* ---------- diagonal motif (from the storyboard: angled split lines) ---------- */
+.diag{position:absolute;inset:0;overflow:hidden;opacity:0;transition:opacity .4s;pointer-events:none}
+.diag i{position:absolute;left:-15%;right:-15%;height:1px;transform-origin:center;
+  background:linear-gradient(90deg,transparent 0%,rgba(200,255,61,.45) 50%,transparent 100%)}
+.diag i:nth-child(1){top:38%;transform:rotate(-19deg)}
+.diag i:nth-child(2){top:63%;transform:rotate(-19deg)}
+
+/* giant ghost section number behind each caption */
+.partblock .ghost{position:absolute;right:-0.05em;bottom:0.9em;font-family:var(--display);font-stretch:125%;font-weight:800;
+  font-size:clamp(7rem,15vw,13rem);line-height:.8;color:rgba(236,231,218,.05);transform:rotate(-12deg);transform-origin:right bottom;pointer-events:none;z-index:-1}
+
+/* skewed lime accent rule */
+.drule{display:block;width:56px;height:3px;background:var(--lime);transform:skewX(-32deg);margin-bottom:18px}
+.drule.center{margin:0 auto 18px}
+
+/* ---------- left part index ---------- */
+.parthud{
+  position:absolute; left:clamp(24px,5vw,56px); top:50%; transform:translateY(-50%);
+  list-style:none; display:grid; gap:15px; opacity:0; transition:opacity .3s; z-index:11;
+}
+.parthud li{display:flex; align-items:center; gap:12px; opacity:.3; transition:opacity .35s, color .35s; color:var(--ash)}
+.parthud li .n{font-family:var(--body); font-weight:600; font-size:.68rem; letter-spacing:.14em}
+.parthud li .t{font-family:var(--body); font-weight:600; font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; position:relative; padding-left:0; transition:padding .35s}
+.parthud li.on{opacity:1; color:var(--bone)}
+.parthud li.on .t{padding-left:18px}
+.parthud li.on .t::before{content:""; position:absolute; left:0; top:50%; width:12px; height:1px; background:var(--lime)}
+@media(max-width:760px){.parthud{display:none}}
+
+/* ---------- bottom progress (lime hairline) ---------- */
+.progress{position:absolute; left:0; right:0; bottom:0; height:2px; background:rgba(236,231,218,.08); z-index:11}
+.progress .pfill{display:block; height:100%; width:100%; transform-origin:left; transform:scaleX(0); background:var(--lime)}
+
+/* respect reduced-motion (modern-web-design accessibility baseline) */
+@media(prefers-reduced-motion:reduce){
+  .cue .bar{animation:none}
+  .cta .btn{transition:none}
+  .cta .btn:hover,.cta .btn:active{transform:none}
+}
+
+/* ============ per-sport data panels ============ */
+.sportblock{position:absolute;top:50%;transform:translateY(-50%);max-width:30ch;opacity:0;transition:opacity .15s linear}
+.sportblock.left{left:clamp(24px,7vw,110px);text-align:left}
+.sportblock.right{right:clamp(24px,7vw,110px);text-align:right}
+.sportblock .ghost{position:absolute;bottom:.6em;font-family:var(--display);font-stretch:125%;font-weight:800;
+  font-size:clamp(7rem,15vw,14rem);line-height:.8;color:rgba(236,231,218,.05);pointer-events:none;z-index:-1}
+.sportblock.left .ghost{right:-.08em;transform:rotate(-12deg);transform-origin:right bottom}
+.sportblock.right .ghost{left:-.08em;transform:rotate(12deg);transform-origin:left bottom}
+.sportblock .drule{display:block;width:56px;height:3px;background:var(--lime);transform:skewX(-32deg);margin-bottom:18px}
+.sportblock.right .drule{margin-left:auto;transform:skewX(32deg)}
+.sportblock .big{font-family:var(--display);font-stretch:110%;font-weight:800;text-transform:uppercase;line-height:.86;
+  letter-spacing:0;font-size:clamp(1.9rem,4.4vw,3.6rem);color:var(--bone);white-space:nowrap}
+.sportblock.right .big{margin-left:auto}
+.sportblock .tagline{font-family:var(--display);font-stretch:110%;font-weight:600;text-transform:uppercase;letter-spacing:.02em;
+  font-size:clamp(1rem,2.1vw,1.5rem);color:var(--lime);margin-top:8px}
+.sportblock .sub{margin-top:16px;color:var(--ash);font-size:clamp(.95rem,1.3vw,1.06rem);line-height:1.6}
+.sportblock.right .sub{margin-left:auto}
+.sportblock .stat{margin-top:18px;color:var(--bone);opacity:.8}
+@media(max-width:760px){
+  .sportblock{left:0!important;right:0!important;text-align:center;max-width:none;padding:0 24px;top:auto;bottom:12%;transform:none}
+  .sportblock .drule{margin:0 auto 18px}
+}
+
+/* ============ combined beat ============ */
+.beat.combined{position:absolute;left:0;right:0;top:30%;text-align:center;padding:0 24px;opacity:0;transition:opacity .15s linear}
+.beat.combined .big{font-family:var(--display);font-stretch:125%;font-weight:800;text-transform:uppercase;line-height:.9;
+  font-size:clamp(2.2rem,7vw,5.4rem);color:var(--bone)}
+.beat.combined .drule{margin:0 auto 22px}
+.beat.combined .sub{margin:18px auto 0;max-width:42ch;text-align:center;color:var(--ash)}
+
+/* ============ Fortius diagonal accordion ============ */
+.acc{position:absolute;inset:0;display:flex;opacity:0;transition:opacity .4s;pointer-events:none}
+.slat{position:relative;flex:1 1 0;min-width:0;overflow:hidden;margin-left:-3%;
+  transition:flex-grow .6s cubic-bezier(.4,0,.1,1);clip-path:polygon(12% 0,100% 0,88% 100%,0 100%)}
+.slat:first-child{margin-left:0;clip-path:polygon(0 0,100% 0,88% 100%,0 100%)}
+.slat:last-child{clip-path:polygon(12% 0,100% 0,100% 100%,0 100%)}
+.slat:nth-child(1){background:linear-gradient(160deg,#1a5e96,#081a2d)}
+.slat:nth-child(2){background:linear-gradient(160deg,#117a52,#06140d)}
+.slat:nth-child(3){background:linear-gradient(160deg,#2278bd,#0a2236)}
+.slat:nth-child(4){background:linear-gradient(160deg,#26331c,#05070a)}
+.slat.on{flex-grow:7}
+.slat .slabel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-90deg);white-space:nowrap;
+  font-family:var(--body);font-weight:600;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(236,231,218,.75);transition:opacity .3s}
+.slat.on .slabel{opacity:0}
+.slat .scontent{position:absolute;left:9%;bottom:13%;max-width:26ch;opacity:0;transition:opacity .5s .15s}
+.slat.on .scontent{opacity:1}
+.slat .scontent .mono{color:var(--lime)}
+.slat .scontent .big{font-family:var(--display);font-stretch:125%;font-weight:800;text-transform:uppercase;line-height:.9;
+  font-size:clamp(1.8rem,4vw,3.4rem);margin:10px 0 14px;color:var(--bone)}
+.slat .scontent .sub{color:rgba(236,231,218,.82);font-size:1.04rem;line-height:1.5}
+.acc .cta{pointer-events:auto;justify-content:flex-start}

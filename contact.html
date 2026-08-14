@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact &amp; Booking — Fortius Sports Academy</title>
+    <meta name="description" content="Book a court, start a membership or get in touch with Fortius Sports Academy, Alpharetta." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter+Tight:ital,wght@0,400;0,500;0,600;1,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  </head>
+  <body data-page="contact">
+    <canvas id="ascii-trail"></canvas>
+    <div data-chrome="nav"></div>
+
+    <section class="phero">
+      <div class="phero__inner">
+        <span class="eyebrow">Contact &amp; booking</span>
+        <h1>Come play.</h1>
+        <p>Book a court, start a membership or just ask a question. We'll get back to you fast.</p>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="split">
+        <div class="split__body">
+          <form class="bookform" novalidate>
+            <div class="bookform__row">
+              <label>Name<input type="text" name="name" placeholder="Your name" required /></label>
+              <label>Phone<input type="tel" name="phone" placeholder="(678) 000-0000" /></label>
+            </div>
+            <label>Email<input type="email" name="email" placeholder="you@email.com" required /></label>
+            <label>I'm interested in
+              <select name="interest">
+                <option>Badminton membership</option>
+                <option>Pickleball membership</option>
+                <option>Table tennis membership</option>
+                <option>Combo — all access</option>
+                <option>Coaching</option>
+                <option>Court booking</option>
+                <option>Hosting an event</option>
+              </select>
+            </label>
+            <label>Message<textarea name="message" rows="4" placeholder="Tell us what you need…"></textarea></label>
+            <button type="submit" class="btn btn--solid btn--lg">Send request</button>
+            <p class="bookform__note" data-note>// We'll reply by phone or email. Prefer to talk now? Call (678) 505-0464.</p>
+          </form>
+        </div>
+        <div class="split__body">
+          <span class="eyebrow">Visit</span>
+          <h3>Two locations.</h3>
+          <div class="contact__grid" style="grid-template-columns:1fr;gap:1rem;margin-top:1.4rem">
+            <div class="contact__block"><h3>Game &amp; Grill</h3><p>5905 Ronald Reagan Blvd<br />Alpharetta, GA 30005</p></div>
+            <div class="contact__block"><h3>Atlanta Recreation Club</h3><p>2711 Pine Grove Rd<br />Cumming, GA 30041</p></div>
+            <div class="contact__block"><h3>Reach us</h3><p><a href="tel:+16785050464">(678) 505-0464</a><br /><a href="mailto:fortius@fsaatl.com">fortius@fsaatl.com</a></p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div data-chrome="footer"></div>
+    <script type="module" src="/src/page.js"></script>
+  </body>
+</html>
