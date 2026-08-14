@@ -22,3 +22,4 @@ initScroll({ trail, island }); // theme flip, reveals, counters
 // the cutouts replace their own src after processing — refresh triggers once
 // the heaviest images are in so pin/positions are measured correctly
 window.addEventListener('load', () => setTimeout(() => ScrollTrigger.refresh(), 400));
+// Force rebuild
