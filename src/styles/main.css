@@ -226,9 +226,11 @@ body.is-page .island { transform: translateX(-50%) translateY(0); } /* always sh
   background: radial-gradient(120% 92% at 50% 26%, transparent 42%, rgba(0,0,0,0.6) 100%); }
 
 .hero__court { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-  width: 112vw; height: 66vh; z-index: 1; }
+  width: 112vw; height: 66vh; z-index: 1;
+  background: url(/img/fortius/badminton-court-bg.jpg) center/cover no-repeat;
+  filter: brightness(0.7) saturate(1.2); }
 .hero__court svg { width: 100%; height: 100%; display: block;
-  filter: drop-shadow(0 0 90px rgba(36, 170, 85, 0.22)); }
+  filter: drop-shadow(0 0 90px rgba(36, 170, 85, 0.22)); opacity: 0; }
 
 .hero__title { position: relative; z-index: 3; margin: 0; text-align: center;
   font-family: var(--display); font-weight: 800; letter-spacing: -0.05em;
@@ -240,10 +242,9 @@ body.is-page .island { transform: translateX(-50%) translateY(0); } /* always sh
 
 .hero__players { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .rise { position: absolute; bottom: var(--b, 0%); width: var(--w, 30vw); z-index: var(--z, 2);
-  filter: drop-shadow(0 30px 60px rgba(0,0,0,0.65)); will-change: transform, opacity;
-  clip-path: polygon(15% 35%, 30% 15%, 50% 32%, 70% 18%, 85% 40%, 100% 100%, 0 100%);
-  object-fit: cover; mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 25%); }
-.rise img { width: 100%; height: 100%; display: block; object-fit: cover; }
+  filter: drop-shadow(0 20px 50px rgba(0,0,0,0.8)); will-change: transform, opacity;
+  /* Remove clip-path to show full player with racket and face */ }
+.rise img { width: 100%; height: auto; display: block; object-fit: contain; }
 .rise--L { left: var(--x, 0); }
 .rise--R { right: var(--x, 0); }
 
