@@ -234,7 +234,7 @@ body.is-page .island { transform: translateX(-50%) translateY(0); } /* always sh
 .hero__court svg { width: 100%; height: 100%; display: block;
   filter: drop-shadow(0 0 90px rgba(36, 170, 85, 0.22)); opacity: 0; }
 
-.hero__title { position: relative; z-index: 3; margin: 0; text-align: center;
+.hero__title { position: relative; z-index: 1; margin: 0; text-align: center;
   font-family: var(--display); font-weight: 800; letter-spacing: -0.05em;
   font-size: clamp(3.6rem, 19vw, 16rem); line-height: 0.82; color: #fff;
   text-shadow: 0 14px 70px rgba(0,0,0,0.55); }
