@@ -61,24 +61,26 @@
           </svg>
         </div>
 
-        <!-- six rising player cutouts (back-to-front DOM order) -->
+        <!-- Six rising player cutouts, back-to-front in DOM order.
+             --h is the figure's height (cutouts are height-sized, see .rise);
+             --z:1,2 sit behind the title, --z:3 overlaps its edges. -->
         <div class="hero__players">
-          <figure class="rise rise--L" style="--x:10vw;--w:26vw;--b:-5%;--z:1">
-            <img class="js-cutout" data-src="./img/players/ready.png" alt="Player with racket ready" />
-          </figure>
-          <figure class="rise rise--R" style="--x:12vw;--w:24vw;--b:-6%;--z:1">
-            <img class="js-cutout" data-src="./img/players/medal.png" alt="Badminton player with medal" />
-          </figure>
-          <figure class="rise rise--L" style="--x:20vw;--w:22vw;--b:-8%;--z:2">
+          <figure class="rise rise--L" style="--x:33vw;--h:30vh;--b:0%;--z:1">
             <img class="js-cutout" data-src="./img/players/cheer.png" alt="Player celebrating" />
           </figure>
-          <figure class="rise rise--R" style="--x:18vw;--w:23vw;--b:-8%;--z:2">
+          <figure class="rise rise--R" style="--x:30vw;--h:32vh;--b:0%;--z:1">
             <img class="js-cutout" data-src="./img/players/lunge.png" alt="Player in action" />
           </figure>
-          <figure class="rise rise--L" style="--x:0vw;--w:34vw;--b:-12%;--z:3">
+          <figure class="rise rise--L" style="--x:22vw;--h:50vh;--b:0%;--z:2">
+            <img class="js-cutout" data-src="./img/players/ready.png" alt="Player with racket ready" />
+          </figure>
+          <figure class="rise rise--R" style="--x:12vw;--h:34vh;--b:0%;--z:2">
+            <img class="js-cutout" data-src="./img/players/medal.png" alt="Badminton player with medal" />
+          </figure>
+          <figure class="rise rise--L" style="--x:-3vw;--h:68vh;--b:-2%;--z:3">
             <img class="js-cutout" data-src="./img/players/smash.png" alt="Player smashing" />
           </figure>
-          <figure class="rise rise--R" style="--x:-2vw;--w:32vw;--b:-10%;--z:3">
+          <figure class="rise rise--R" style="--x:-3vw;--h:62vh;--b:-2%;--z:3">
             <img class="js-cutout" data-src="./img/players/stand.png" alt="Player standing" />
           </figure>
         </div>
