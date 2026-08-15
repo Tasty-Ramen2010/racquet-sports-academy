@@ -225,16 +225,14 @@ body.is-page .island { transform: translateX(-50%) translateY(0); } /* always sh
 .hero__vignette { position: absolute; inset: 0; z-index: 5; pointer-events: none;
   background: radial-gradient(120% 92% at 50% 26%, transparent 42%, rgba(0,0,0,0.6) 100%); }
 
-.hero__court { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-  width: 112vw; height: 66vh; z-index: 1;
+.hero__court { position: absolute; inset: 0; z-index: 1;
   background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)),
-              url(/img/fortius/courts-12.jpg) center/cover no-repeat;
-  background-attachment: fixed;
+              url(/img/fortius/courts-12.jpg) center center/cover no-repeat;
   filter: brightness(0.8) contrast(1.1) saturate(1.3); }
 .hero__court svg { width: 100%; height: 100%; display: block;
   filter: drop-shadow(0 0 90px rgba(36, 170, 85, 0.22)); opacity: 0; }
 
-.hero__title { position: relative; z-index: 1; margin: 0; text-align: center;
+.hero__title { position: relative; z-index: 2; margin: 0; text-align: center;
   font-family: var(--display); font-weight: 800; letter-spacing: -0.05em;
   font-size: clamp(3.6rem, 19vw, 16rem); line-height: 0.82; color: #fff;
   text-shadow: 0 14px 70px rgba(0,0,0,0.55); }
@@ -242,11 +240,11 @@ body.is-page .island { transform: translateX(-50%) translateY(0); } /* always sh
   font-size: clamp(0.58rem, 1.4vw, 0.85rem); letter-spacing: 0.5em; text-transform: uppercase;
   color: var(--court-bright); text-shadow: none; margin-top: 1.5rem; padding-left: 0.5em; }
 
-.hero__players { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.hero__players { position: absolute; inset: 0; pointer-events: none; }
 .rise { position: absolute; bottom: var(--b, 0%); width: var(--w, 30vw); z-index: var(--z, 2);
   filter: drop-shadow(0 20px 50px rgba(0,0,0,0.8)); will-change: transform, opacity;
-  height: auto; }
-.rise img { width: 100%; height: auto; display: block; object-fit: contain; object-position: center bottom; }
+  display: flex; align-items: flex-end; justify-content: center; }
+.rise img { width: auto; max-width: 100%; max-height: 82vh; height: auto; display: block; }
 .rise--L { left: var(--x, 0); }
 .rise--R { right: var(--x, 0); }
 
